@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Save, Bell, Shield, Globe, Palette } from 'lucide-react'
+import { Save, Bell, Shield, Globe, Palette, GraduationCap, Plus } from 'lucide-react'
+import { useSession } from '../../context/SessionContext'
 
 export default function Settings() {
+  const { activeSession, setActiveSession, sessionList } = useSession()
   const [activeTab, setActiveTab] = useState('general')
 
   const tabs = [
     { id: 'general', label: 'General', icon: Globe },
+    { id: 'sessions', label: 'Sessions', icon: GraduationCap },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'roles', label: 'Roles & Permissions', icon: Shield },
     { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -90,6 +93,49 @@ export default function Settings() {
                     <input className="input-field" type="number" defaultValue="1500" />
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'sessions' && (
+            <div className="card space-y-6">
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 mb-1">Session Management</h3>
+                <p className="text-sm text-gray-500">Manage club sessions (academic/fiscal years)</p>
+              </div>
+              <div className="space-y-3">
+                {sessionList.map(s => (
+                  <div key={s.id} className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${activeSession === s.id ? 'border-primary-600 bg-primary-50/50' : 'border-gray-100 bg-gray-50'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.status === 'Active' ? 'bg-accent-green/10' : 'bg-gray-200'}`}>
+                        <GraduationCap className={`w-5 h-5 ${s.status === 'Active' ? 'text-accent-green' : 'text-gray-500'}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{s.label}</p>
+                        <p className="text-xs text-gray-500">{s.startYear}–{s.endYear} session</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-lg ${s.status === 'Active' ? 'bg-accent-green/10 text-accent-green' : 'bg-gray-200 text-gray-500'}`}>
+                        {s.status}
+                      </span>
+                      {activeSession !== s.id && (
+                        <button
+                          onClick={() => setActiveSession(s.id)}
+                          className="text-xs text-primary-600 font-medium hover:text-primary-700"
+                        >
+                          Switch
+                        </button>
+                      )}
+                      {activeSession === s.id && (
+                        <span className="text-xs text-primary-600 font-medium">Current</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-4 border-t border-gray-100">
+                <button className="btn-secondary text-sm"><Plus className="w-4 h-4 mr-1.5" /> Create New Session</button>
               </div>
             </div>
           )}

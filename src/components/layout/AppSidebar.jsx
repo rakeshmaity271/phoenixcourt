@@ -1,9 +1,11 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, CreditCard, CalendarCheck, CalendarDays,
-  Package, Receipt, Trophy, BarChart3, Megaphone, Settings, X, ChevronDown
+  Package, Receipt, Trophy, BarChart3, Megaphone, Settings, X, ChevronDown,
+  GraduationCap
 } from 'lucide-react'
 import { useState } from 'react'
+import { useSession } from '../../context/SessionContext'
 
 const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
@@ -24,6 +26,8 @@ const bottomItems = [
 
 export default function AppSidebar({ isOpen, onClose }) {
   const location = useLocation()
+  const { activeSession, setActiveSession, sessionList, activeSessionObj } = useSession()
+  const [showSessionPicker, setShowSessionPicker] = useState(false)
 
   const isActive = (path) => {
     if (path === '/dashboard') return location.pathname === '/dashboard'
@@ -50,8 +54,43 @@ export default function AppSidebar({ isOpen, onClose }) {
         </button>
       </div>
 
+      {/* Session Selector */}
+      <div className="px-3 pt-4 pb-2">
+        <div className="relative">
+          <button
+            onClick={() => setShowSessionPicker(!showSessionPicker)}
+            className="flex items-center justify-between w-full px-3 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-primary-600" />
+              <span className="text-sm font-semibold text-gray-900">{activeSessionObj.label}</span>
+              <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-md ${activeSessionObj.status === 'Active' ? 'bg-accent-green/10 text-accent-green' : 'bg-gray-200 text-gray-500'}`}>
+                {activeSessionObj.status}
+              </span>
+            </div>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${showSessionPicker ? 'rotate-180' : ''}`} />
+          </button>
+          {showSessionPicker && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-soft z-50 overflow-hidden">
+              {sessionList.map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => { setActiveSession(s.id); setShowSessionPicker(false) }}
+                  className={`flex items-center justify-between w-full px-3 py-2.5 text-sm hover:bg-gray-50 transition-colors ${activeSession === s.id ? 'bg-primary-50 text-primary-700' : 'text-gray-700'}`}
+                >
+                  <span className="font-medium">{s.label}</span>
+                  <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded-md ${s.status === 'Active' ? 'bg-accent-green/10 text-accent-green' : 'bg-gray-200 text-gray-500'}`}>
+                    {s.status}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto scrollbar-hide">
+      <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-hide">
         <p className="px-3 mb-2 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
         {navItems.map(item => (
           <NavLink

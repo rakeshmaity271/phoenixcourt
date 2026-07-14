@@ -8,7 +8,8 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar
 } from 'recharts'
-import { revenueData, recentActivity, tournaments, bookings } from '../../data/mockData'
+import { revenueData, revenueData as allRevenueData, recentActivity, tournaments, bookings } from '../../data/mockData'
+import { useSession } from '../../context/SessionContext'
 
 const stats = [
   { label: 'Active Members', value: '148', change: '+12', up: true, icon: Users, color: 'bg-primary-50 text-primary-600' },
@@ -37,6 +38,9 @@ const upcomingEvents = [
 ]
 
 export default function Overview() {
+  const { activeSession } = useSession()
+  const sessionRevenue = allRevenueData[activeSession] || allRevenueData['2026-2027']
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -46,6 +50,7 @@ export default function Overview() {
           <p className="page-subtitle">Welcome back! Here's what's happening at Phoenix Court Hub.</p>
         </div>
         <div className="flex items-center gap-2">
+          <span className="px-3 py-1.5 text-xs font-semibold bg-primary-50 text-primary-700 rounded-lg">Session: {activeSession}</span>
           <button className="btn-secondary text-sm">
             <CalendarDays className="w-4 h-4 mr-1.5" /> This Month
           </button>
@@ -80,7 +85,7 @@ export default function Overview() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-base font-semibold text-gray-900">Revenue & Expenses</h3>
-              <p className="text-sm text-gray-500">Monthly trends for the last 7 months</p>
+              <p className="text-sm text-gray-500">Monthly trends for {activeSession}</p>
             </div>
             <div className="flex items-center gap-4 text-xs">
               <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-primary-500" /> Revenue</span>
@@ -88,7 +93,7 @@ export default function Overview() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={260}>
-            <LineChart data={revenueData}>
+            <LineChart data={sessionRevenue}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} tickFormatter={(v) => `₹${v / 1000}K`} />

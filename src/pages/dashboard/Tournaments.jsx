@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Trophy, Users, Calendar, MapPin, ChevronRight } from 'lucide-react'
 import { tournaments } from '../../data/mockData'
+import { useSession } from '../../context/SessionContext'
 
 export default function Tournaments() {
+  const { activeSession } = useSession()
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [filter, setFilter] = useState('All')
 
-  const filtered = tournaments.filter(t => filter === 'All' || t.status === filter)
+  const sessionTournaments = tournaments.filter(t => t.session === activeSession)
+  const filtered = sessionTournaments.filter(t => filter === 'All' || t.status === filter)
 
   const statusColor = (status) => {
     if (status === 'Completed') return 'badge-blue'
@@ -20,7 +23,7 @@ export default function Tournaments() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Tournaments</h1>
-          <p className="page-subtitle">Organize and manage club tournaments</p>
+          <p className="page-subtitle">Organize and manage club tournaments — <span className="font-medium text-primary-600">{activeSession}</span></p>
         </div>
         <button onClick={() => setShowCreateModal(true)} className="btn-primary text-sm"><Plus className="w-4 h-4 mr-1.5" /> Create Tournament</button>
       </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Plus, Download, Receipt, TrendingUp } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 import { expenses } from '../../data/mockData'
+import { useSession } from '../../context/SessionContext'
 
 const categoryData = [
   { name: 'Equipment', value: 31400, color: '#2563EB' },
@@ -12,15 +13,26 @@ const categoryData = [
 ]
 
 export default function Expenses() {
+  const { activeSession } = useSession()
   const [showAddModal, setShowAddModal] = useState(false)
-  const total = expenses.reduce((sum, e) => sum + e.amount, 0)
+
+  const sessionExpenses = expenses.filter(e => e.session === activeSession)
+  const total = sessionExpenses.reduce((sum, e) => sum + e.amount, 0)
+
+  // Compute category breakdown from session expenses
+  const catMap = {}
+  const colorMap = { 'Equipment': '#2563EB', 'Utilities': '#10B981', 'Tournament': '#F97316', 'Court Maintenance': '#8B5CF6', 'Maintenance': '#8B5CF6', 'Miscellaneous': '#EC4899' }
+  sessionExpenses.forEach(e => {
+    catMap[e.category] = (catMap[e.category] || 0) + e.amount
+  })
+  const categoryData = Object.entries(catMap).map(([name, value]) => ({ name, value, color: colorMap[name] || '#6B7280' }))
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Expenses</h1>
-          <p className="page-subtitle">Track and manage club expenditures</p>
+          <p className="page-subtitle">Track and manage club expenditures — <span className="font-medium text-primary-600">{activeSession}</span></p>
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-secondary text-sm"><Download className="w-4 h-4 mr-1.5" /> Export</button>
@@ -62,7 +74,7 @@ export default function Expenses() {
                 </tr>
               </thead>
               <tbody>
-                {expenses.map(exp => (
+                {sessionExpenses.map(exp => (
                   <tr key={exp.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <td className="table-cell font-medium text-gray-900">{exp.description}</td>
                     <td className="table-cell hidden sm:table-cell"><span className="badge-blue">{exp.category}</span></td>

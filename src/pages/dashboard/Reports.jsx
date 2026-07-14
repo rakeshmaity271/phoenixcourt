@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Download, FileText, Calendar } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { revenueData, monthlyAttendanceTrend } from '../../data/mockData'
+import { useSession } from '../../context/SessionContext'
 
 const reportTypes = [
   { id: 'collection', label: 'Collection Report', icon: '💰' },
@@ -29,14 +30,21 @@ const duesData = [
 ]
 
 export default function Reports() {
+  const { activeSession } = useSession()
   const [activeReport, setActiveReport] = useState('collection')
+
+  const sessionRevenue = revenueData[activeSession] || revenueData['2026-2027']
+  const sessionAttendance = monthlyAttendanceTrend[activeSession] || monthlyAttendanceTrend['2026-2027']
+
+  const sessionCollectionData = sessionRevenue.map(d => ({ month: d.month, amount: d.revenue }))
+  const sessionExpenseTrend = sessionRevenue.map(d => ({ month: d.month, amount: d.expenses }))
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Reports & Analytics</h1>
-          <p className="page-subtitle">Generate and download club reports</p>
+          <p className="page-subtitle">Generate and download club reports — <span className="font-medium text-primary-600">{activeSession}</span></p>
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-secondary text-sm"><Calendar className="w-4 h-4 mr-1.5" /> Jul 2026</button>
@@ -75,7 +83,7 @@ export default function Reports() {
           </div>
           <ResponsiveContainer width="100%" height={280}>
             {activeReport === 'collection' ? (
-              <BarChart data={collectionData}>
+              <BarChart data={sessionCollectionData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} tickFormatter={(v) => `₹${v / 1000}K`} />
@@ -83,7 +91,7 @@ export default function Reports() {
                 <Bar dataKey="amount" fill="#2563EB" radius={[6, 6, 0, 0]} />
               </BarChart>
             ) : activeReport === 'attendance' ? (
-              <AreaChart data={monthlyAttendanceTrend}>
+              <AreaChart data={sessionAttendance}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} domain={[60, 100]} tickFormatter={(v) => `${v}%`} />
@@ -91,7 +99,7 @@ export default function Reports() {
                 <Area type="monotone" dataKey="rate" stroke="#2563EB" fill="#DBEAFE" strokeWidth={2.5} />
               </AreaChart>
             ) : activeReport === 'expense' ? (
-              <LineChart data={expenseTrend}>
+              <LineChart data={sessionExpenseTrend}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} tickFormatter={(v) => `₹${v / 1000}K`} />

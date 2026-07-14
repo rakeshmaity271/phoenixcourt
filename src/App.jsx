@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { SessionProvider } from './context/SessionContext'
 import DashboardLayout from './components/layout/DashboardLayout'
 import LandingLayout from './components/layout/LandingLayout'
 import Landing from './pages/Landing'
@@ -19,6 +20,7 @@ import Settings from './pages/dashboard/Settings'
 
 function App() {
   return (
+    <SessionProvider>
     <BrowserRouter>
       <Routes>
         {/* Landing page */}
@@ -45,6 +47,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </SessionProvider>
   )
 }
 

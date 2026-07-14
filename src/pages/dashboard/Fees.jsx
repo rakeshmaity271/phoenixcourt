@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Search, Plus, Download, Bell, CreditCard, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { fees } from '../../data/mockData'
+import { useSession } from '../../context/SessionContext'
 
 const monthlyData = [
   { month: 'Jan', collected: 42000, pending: 5000 },
@@ -14,15 +15,18 @@ const monthlyData = [
 ]
 
 export default function Fees() {
+  const { activeSession } = useSession()
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [showRecordModal, setShowRecordModal] = useState(false)
 
-  const paid = fees.filter(f => f.status === 'Paid')
-  const pending = fees.filter(f => f.status === 'Pending')
-  const overdue = fees.filter(f => f.status === 'Overdue')
+  const sessionFees = fees.filter(f => f.session === activeSession)
 
-  const filtered = fees.filter(f => {
+  const paid = sessionFees.filter(f => f.status === 'Paid')
+  const pending = sessionFees.filter(f => f.status === 'Pending')
+  const overdue = sessionFees.filter(f => f.status === 'Overdue')
+
+  const filtered = sessionFees.filter(f => {
     const matchSearch = f.memberName.toLowerCase().includes(search.toLowerCase())
     const matchStatus = statusFilter === 'All' || f.status === statusFilter
     return matchSearch && matchStatus
@@ -37,7 +41,7 @@ export default function Fees() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="page-title">Monthly Fees</h1>
-          <p className="page-subtitle">Manage and track member fee payments</p>
+          <p className="page-subtitle">Manage and track member fee payments — <span className="font-medium text-primary-600">{activeSession}</span></p>
         </div>
         <div className="flex items-center gap-2">
           <button className="btn-secondary text-sm"><Download className="w-4 h-4 mr-1.5" /> Export</button>
@@ -161,7 +165,7 @@ export default function Fees() {
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Member</label>
                 <select className="input-field">
                   <option>Select member...</option>
-                  {fees.filter(f => f.status !== 'Paid').map(f => (
+                  {fees.filter(f => f.status !== 'Paid' && f.session === activeSession).map(f => (
                     <option key={f.id}>{f.memberName}</option>
                   ))}
                 </select>
