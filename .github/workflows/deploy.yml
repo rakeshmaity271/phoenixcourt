@@ -1,0 +1,56 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Build project
+      - name: Build project
+        run: npm run build
+
+      # Step 5: Deploy to server via SSH
+      - name: Deploy to production server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: 'dist/'
+          REMOTE_HOST: ${{ secrets.SERVER_IP }}
+          REMOTE_USER: ${{ secrets.SERVER_USER }}
+          TARGET: '/home/kodeclouds-phoenix/htdocs/phoenix.kodeclouds.com/'
+          ARGS: '-rlgoDzvc -i --delete'
+          SCRIPT_AFTER: |
+            echo "Deployment complete at $(date)"
+            ls -la /home/kodeclouds-phoenix/htdocs/phoenix.kodeclouds.com/
+
+      # Step 6: Notification
+      - name: Deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful! Site: https://phoenix.kodeclouds.com"
+          else
+            echo "❌ Deployment failed. Check logs above."
+            exit 1
+          fi
