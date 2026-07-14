@@ -17,6 +17,13 @@ import Reports from './pages/dashboard/Reports'
 import Announcements from './pages/dashboard/Announcements'
 import Profile from './pages/dashboard/Profile'
 import Settings from './pages/dashboard/Settings'
+import SeniorGroup from './pages/senior-group/SeniorGroup'
+import SeniorMembers from './pages/senior-group/SeniorMembers'
+import BallFees from './pages/senior-group/BallFees'
+import ShuttleStock from './pages/senior-group/ShuttleStock'
+import SeniorExpenses from './pages/senior-group/SeniorExpenses'
+import FundSummary from './pages/senior-group/FundSummary'
+import SeniorReports from './pages/senior-group/SeniorReports'
 
 function App() {
   return (
@@ -44,6 +51,15 @@ function App() {
           <Route path="announcements" element={<Announcements />} />
           <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
+
+          {/* Senior Group Module */}
+          <Route path="senior-group" element={<SeniorGroup />} />
+          <Route path="senior-group/members" element={<SeniorMembers />} />
+          <Route path="senior-group/ball-fees" element={<BallFees />} />
+          <Route path="senior-group/shuttle-stock" element={<ShuttleStock />} />
+          <Route path="senior-group/expenses" element={<SeniorExpenses />} />
+          <Route path="senior-group/fund-summary" element={<FundSummary />} />
+          <Route path="senior-group/reports" element={<SeniorReports />} />
         </Route>
       </Routes>
     </BrowserRouter>

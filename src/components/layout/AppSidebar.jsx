@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard, Users, CreditCard, CalendarCheck, CalendarDays,
   Package, Receipt, Trophy, BarChart3, Megaphone, Settings, X, ChevronDown,
-  GraduationCap
+  GraduationCap, Wallet, ShoppingCart
 } from 'lucide-react'
 import { useState } from 'react'
 import { useSession } from '../../context/SessionContext'
@@ -18,6 +18,16 @@ const navItems = [
   { path: '/dashboard/tournaments', icon: Trophy, label: 'Tournaments' },
   { path: '/dashboard/reports', icon: BarChart3, label: 'Reports' },
   { path: '/dashboard/announcements', icon: Megaphone, label: 'Announcements' },
+]
+
+const seniorGroupItems = [
+  { path: '/dashboard/senior-group', icon: Wallet, label: 'SG Dashboard' },
+  { path: '/dashboard/senior-group/members', icon: Users, label: 'SG Members' },
+  { path: '/dashboard/senior-group/ball-fees', icon: CreditCard, label: 'Ball Fees' },
+  { path: '/dashboard/senior-group/shuttle-stock', icon: ShoppingCart, label: 'Shuttle Stock' },
+  { path: '/dashboard/senior-group/expenses', icon: Receipt, label: 'SG Expenses' },
+  { path: '/dashboard/senior-group/fund-summary', icon: Wallet, label: 'Fund Summary' },
+  { path: '/dashboard/senior-group/reports', icon: BarChart3, label: 'SG Reports' },
 ]
 
 const bottomItems = [
@@ -93,6 +103,22 @@ export default function AppSidebar({ isOpen, onClose }) {
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto scrollbar-hide">
         <p className="px-3 mb-2 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Menu</p>
         {navItems.map(item => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            onClick={onClose}
+            className={`sidebar-link ${isActive(item.path) ? 'active' : ''}`}
+          >
+            <item.icon className="w-[18px] h-[18px]" />
+            <span>{item.label}</span>
+          </NavLink>
+        ))}
+
+        {/* Senior Group Section */}
+        <p className="px-3 mt-4 mb-2 text-[11px] font-semibold text-accent-orange/70 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent-orange/50" /> Senior Group (9:30 PM)
+        </p>
+        {seniorGroupItems.map(item => (
           <NavLink
             key={item.path}
             to={item.path}
